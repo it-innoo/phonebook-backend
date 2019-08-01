@@ -1,0 +1,19 @@
+{
+  "name": "phonebook-backend",
+  "version": "1.0.0",
+  "description": "puhelinluettelon backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/it-innoo/phonebook-backend.git"
+  },
+  "author": "jailgreen <jukka@jahlgren.eu>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/it-innoo/phonebook-backend/issues"
+  },
+  "homepage": "https://github.com/it-innoo/phonebook-backend#readme"
+}
