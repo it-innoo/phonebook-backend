@@ -6,22 +6,22 @@ app.use(bodyParser.json())
 
 let persons = [
   {
-    "name": "Arto Hellas",
+    "person": "Arto Hellas",
     "number": "040-123456",
     "id": 1
   },
   {
-    "name": "Ada Lovelace",
+    "person": "Ada Lovelace",
     "number": "39-44-5323523",
     "id": 2
   },
   {
-    "name": "Dan Abramov",
+    "person": "Dan Abramov",
     "number": "12-43-234345",
     "id": 3
   },
   {
-    "name": "Mary Poppendieck",
+    "person": "Mary Poppendieck",
     "number": "39-23-6423122",
     "id": 4
   }
@@ -58,17 +58,35 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
-  const name = persons.find(p => p.id === id)
+  const person = persons.find(p => p.id === id)
 
-  name ? response.json(name) : response.status(404).end()
+  person ? response.json(person) : response.status(404).end()
 })
 
 app.post('/api/persons', (request, response) => {
-  const name = request.body
-  name.id = generateId()
+  const person = request.body
 
-  persons = persons.concat(name)
-  response.json(name)
+  if (!person.name) {
+    return response.status(400).json({
+      error: 'name is missing'
+    })
+  }
+
+  if (!person.number) {
+    return response.status(400).json({
+      error: 'number is missing'
+    })
+  }
+
+  if (persons.find(p => p.name === person.name)) {
+    return response.status(400).json({
+      error: 'name must be unique'
+    })
+  }
+  person.id = generateId()
+
+  persons = persons.concat(person)
+  response.json(person)
 })
 
 app.delete('/api/persons/:id', (request, response) => {
