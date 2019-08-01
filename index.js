@@ -1,5 +1,8 @@
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.json())
 
 let persons = [
   {
@@ -23,6 +26,14 @@ let persons = [
     "id": 4
   }
 ]
+
+const generateId = () => {
+  const minId = Math.ceil(persons.length > 0
+    ? Math.max(...persons.map(p => p.id))
+    : 0)
+  const maxId = Math.floor(1000000)
+  return Math.floor(Math.random() * (maxId - minId)) + minId
+}
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
@@ -50,6 +61,14 @@ app.get('/api/persons/:id', (request, response) => {
   const name = persons.find(p => p.id === id)
 
   name ? response.json(name) : response.status(404).end()
+})
+
+app.post('/api/persons', (request, response) => {
+  const name = request.body
+  name.id = generateId()
+
+  persons = persons.concat(name)
+  response.json(name)
 })
 
 app.delete('/api/persons/:id', (request, response) => {
