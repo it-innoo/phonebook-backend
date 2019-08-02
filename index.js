@@ -9,32 +9,35 @@ morgan
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 
-let persons = [
+let names = [
   {
-    "person": "Arto Hellas",
+    "name": "Arto Hellas",
     "number": "040-123456",
     "id": 1
   },
   {
-    "person": "Ada Lovelace",
+    "name": "Ada Lovelace",
     "number": "39-44-5323523",
     "id": 2
   },
   {
-    "person": "Dan Abramov",
+    "name": "Dan Abramov",
     "number": "12-43-234345",
     "id": 3
   },
   {
-    "person": "Mary Poppendieck",
+    "name": "Mary Poppendieck",
     "number": "39-23-6423122",
     "id": 4
   }
 ]
 
+const cors = require('cors')
+app.use(cors())
+
 const generateId = () => {
-  const minId = Math.ceil(persons.length > 0
-    ? Math.max(...persons.map(p => p.id))
+  const minId = Math.ceil(names.length > 0
+    ? Math.max(...names.map(p => p.id))
     : 0)
   const maxId = Math.floor(1000000)
   return Math.floor(Math.random() * (maxId - minId)) + minId
@@ -48,7 +51,7 @@ app.get('/info', (request, response) => {
   response.send(
     `
     <p>Puhelinluettelossa
-        ${persons.length} henkilön tiedot
+        ${names.length} henkilön tiedot
     </p>
     <p>
       ${new Date()}
@@ -58,14 +61,14 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  response.json(names)
 })
 
 app.get('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
-  const person = persons.find(p => p.id === id)
+  const name = names.find(p => p.id === id)
 
-  person ? response.json(person) : response.status(404).end()
+  name ? response.json(name) : response.status(404).end()
 })
 
 app.post('/api/persons', (request, response) => {
@@ -83,20 +86,20 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  if (persons.find(p => p.name === person.name)) {
+  if (names.find(p => p.name === person.name)) {
     return response.status(400).json({
       error: 'name must be unique'
     })
   }
   person.id = generateId()
 
-  persons = persons.concat(person)
+  names = names.concat(person)
   response.json(person)
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/names/:id', (request, response) => {
   const id = Number(request.params.id)
-  persons = persons.filter(p => p.id !== id)
+  names = names.filter(p => p.id !== id)
 
   response.status(204).end()
 })
