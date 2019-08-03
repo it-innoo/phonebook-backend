@@ -1,9 +1,14 @@
 const express = require('express')
-const app = express()
 const bodyParser = require('body-parser')
+const cors = require('cors')
 const morgan = require('morgan')
 
+const app = express()
+
 app.use(bodyParser.json())
+app.use(cors())
+app.use(express.static('build'))
+
 morgan
   .token('body', req => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
@@ -31,9 +36,6 @@ let names = [
     "id": 4
   }
 ]
-
-const cors = require('cors')
-app.use(cors())
 
 const generateId = () => {
   const minId = Math.ceil(names.length > 0
