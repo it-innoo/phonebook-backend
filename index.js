@@ -1,7 +1,10 @@
+
+require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const morgan = require('morgan')
+const Person = require('./models/person')
 
 const app = express()
 
@@ -50,20 +53,28 @@ app.get('/', (req, res) => {
 })
 
 app.get('/info', (request, response) => {
-  response.send(
-    `
-    <p>Puhelinluettelossa
-        ${names.length} henkilön tiedot
-    </p>
-    <p>
-      ${new Date()}
-    </p>
-    `
-  )
+  Person
+    .find()
+    .then((persons) => {
+      response
+        .send(
+          `<p>
+        Puhelinluettelossa
+        ${persons.length} henkilön tiedot
+        </p>
+        <p>
+          ${new Date()}
+        </p>`,
+        )
+    })
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(names)
+  Person
+    .find({})
+    .then((persons) => {
+      response.json(persons.map(p => p.toJSON()))
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -112,7 +123,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
