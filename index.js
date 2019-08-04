@@ -85,29 +85,17 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-  const person = request.body
+  const { name, number } = request.body
 
-  if (!person.name) {
-    return response.status(400).json({
-      error: 'name is missing'
+  const person = new Person({
+    name, number
+  })
+
+  person
+    .save()
+    .then(savedPerson => {
+      response.json(savedPerson.toJSON())
     })
-  }
-
-  if (!person.number) {
-    return response.status(400).json({
-      error: 'number is missing'
-    })
-  }
-
-  if (names.find(p => p.name === person.name)) {
-    return response.status(400).json({
-      error: 'name must be unique'
-    })
-  }
-  person.id = generateId()
-
-  names = names.concat(person)
-  response.json(person)
 })
 
 app.delete('/api/names/:id', (request, response) => {
