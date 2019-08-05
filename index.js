@@ -56,11 +56,17 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
-app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const name = names.find(p => p.id === id)
-
-  name ? response.json(name) : response.status(404).end()
+app.get('/api/persons/:id', (request, response, next) => {
+  Person
+    .findById(request.params.id)
+    .then(person => {
+      if (person) {
+        response.json(person.toJSON())
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -87,7 +93,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
-  // console.error(response)
 }
 
 app.use(unknownEndpoint)
