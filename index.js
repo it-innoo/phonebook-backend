@@ -16,37 +16,16 @@ morgan
   .token('body', req => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
 
-let names = [
-  {
-    "name": "Arto Hellas",
-    "number": "040-123456",
-    "id": 1
-  },
-  {
-    "name": "Ada Lovelace",
-    "number": "39-44-5323523",
-    "id": 2
-  },
-  {
-    "name": "Dan Abramov",
-    "number": "12-43-234345",
-    "id": 3
-  },
-  {
-    "name": "Mary Poppendieck",
-    "number": "39-23-6423122",
-    "id": 4
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
+    return response.status(400).send({ error: 'malformatted id' })
   }
-]
 
-const generateId = () => {
-  const minId = Math.ceil(names.length > 0
-    ? Math.max(...names.map(p => p.id))
-    : 0)
-  const maxId = Math.floor(1000000)
-  return Math.floor(Math.random() * (maxId - minId)) + minId
+  next(error)
 }
+
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
@@ -98,18 +77,21 @@ app.post('/api/persons', (request, response) => {
     })
 })
 
-app.delete('/api/names/:id', (request, response) => {
-  const id = Number(request.params.id)
-  names = names.filter(p => p.id !== id)
-
-  response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+  Person.findByIdAndRemove(request.params.id)
+    .then(() => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
+  // console.error(response)
 }
 
 app.use(unknownEndpoint)
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
